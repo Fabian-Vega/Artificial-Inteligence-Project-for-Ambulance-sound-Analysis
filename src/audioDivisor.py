@@ -1,37 +1,24 @@
-import wave
 import os
+import re
 
-def split_wav(input_file, output_folder, segment_length=3):
-    # Asegurarse de que el directorio de salida existe
-    os.makedirs(output_folder, exist_ok=True)
+def rename_segments(folder):
+    # Expresión regular para capturar el nombre del archivo y el número
+    pattern = re.compile(r"segment_(\d+)\.mp3")
     
-    with wave.open(input_file, 'rb') as wf:
-        # Obtener parámetros del archivo de audio
-        params = wf.getparams()
-        framerate = wf.getframerate()
-        nframes = wf.getnframes()
-        sample_width = wf.getsampwidth()
-        n_channels = wf.getnchannels()
-        
-        # Duración total del archivo de audio en segundos
-        duration = nframes / float(framerate)
-        
-        # Dividir el audio en segmentos de la longitud especificada
-        for i in range(0, int(duration), segment_length):
-            wf.setpos(i * framerate)
-            frames = wf.readframes(segment_length * framerate)
+    for filename in os.listdir(folder):
+        match = pattern.match(filename)
+        if match:
+            number = match.group(1)
+            new_number = number.zfill(3)  # Agregar ceros a la izquierda para que tenga al menos 3 dígitos
+            new_filename = f"segment_{new_number}.mp3"
+            old_path = os.path.join(folder, filename)
+            new_path = os.path.join(folder, new_filename)
             
-            segment_name = f"{output_folder}/segment_{i // segment_length + 1}.wav"
-            with wave.open(segment_name, 'wb') as segment_wf:
-                segment_wf.setnchannels(n_channels)
-                segment_wf.setsampwidth(sample_width)
-                segment_wf.setframerate(framerate)
-                segment_wf.writeframes(frames)
-            
-            print(f"Archivo guardado: {segment_name}")
+            # Renombrar el archivo
+            os.rename(old_path, new_path)
+            print(f"Renombrado: {filename} -> {new_filename}")
 
 # Uso de la función
-input_audio_file = "./audio/ambulance_dataset.wav"
-output_folder = "./data"
+folder = "./data"  # Cambia esto a la ruta de tu carpeta de archivos MP3
 
-split_wav(input_audio_file, output_folder)
+rename_segments(folder)
