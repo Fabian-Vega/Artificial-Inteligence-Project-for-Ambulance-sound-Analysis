@@ -8,10 +8,10 @@ from pydub.playback import play
 import simpleaudio as sa
 
 # Paths
-unheard_folder = '../data/Marlon'
-sirens_folder = '../data/Marlon/sirens'
-ambient_folder = '../data/Marlon/ambient'
-unusable_folder = '../data/Marlon/unusable'
+unheard_folder = '../data/unclassified/Archi'
+sirens_folder = '../data/unclassified/Archi/sirens'
+ambient_folder = '../data/unclassified/Archi/ambient'
+unusable_folder = '../data/unclassified/Archi/unusable'
 
 # Function to play audio
 def play_audio(file_path):
