@@ -29,7 +29,7 @@ def cortar_mp3(ruta_mp3, duracion_segmento, ruta_salida, prefijo_salida):
         segmentos.append(segmento)
 
         # Guardar el segmento en un archivo individual
-        nombre_salida = f'{prefijo_salida}_{len(segmentos)+278}.mp3'
+        nombre_salida = f'{prefijo_salida}_{len(segmentos)}.mp3'
         segmento.export(os.path.join(ruta_salida, nombre_salida), format='mp3')
 
         # Actualizar los puntos de inicio y fin
