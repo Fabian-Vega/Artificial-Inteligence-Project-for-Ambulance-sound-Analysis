@@ -29,7 +29,8 @@ def cortar_mp3(ruta_mp3, duracion_segmento, ruta_salida, prefijo_salida):
         segmentos.append(segmento)
 
         # Guardar el segmento en un archivo individual
-        nombre_salida = f'{prefijo_salida}_{len(segmentos)}.mp3'
+        numero_segmento = str(len(segmentos)).zfill(3)
+        nombre_salida = f'{prefijo_salida}_{numero_segmento}.mp3'
         segmento.export(os.path.join(ruta_salida, nombre_salida), format='mp3')
 
         # Actualizar los puntos de inicio y fin
@@ -42,5 +43,5 @@ def cortar_mp3(ruta_mp3, duracion_segmento, ruta_salida, prefijo_salida):
 ruta_mp3 = '../data/sonidoAmbiente.mp3'
 ruta_salida = '../data/unheard'
 duracion_segmento = 3  # Duración del segmento en segundos
-prefijo_salida = 'segmento'
+prefijo_salida = 'segment'
 segmentos = cortar_mp3(ruta_mp3, duracion_segmento, ruta_salida, prefijo_salida)
