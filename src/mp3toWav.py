@@ -2,8 +2,8 @@ from pydub import AudioSegment
 import os
 
 # Carpeta de entrada y salida
-carpeta_entrada = '../data/sirens'
-carpeta_salida = '../data/sirens_wav'
+carpeta_entrada = '../data/unheard'
+carpeta_salida = '../data/unheard_wav'
 
 # Crear la carpeta de salida si no existe
 if not os.path.exists(carpeta_salida):
