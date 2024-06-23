@@ -18,27 +18,24 @@ def load_wav_16k_mono(filename):
 
 
 
-POS = os.path.join('data', 'sirens_wav')
-NEG = os.path.join( 'data', 'unheard_wav')
+POS = os.path.join('data', 'sirens_wav') #Concatena la direccion de la carpeta con los wav de las sirenas
+NEG = os.path.join( 'data', 'unheard_wav') #Concatena la direccion de la carpeta con los wav de las no sirenas
 
 
-pos_files = os.listdir(POS)
-neg_files = os.listdir(NEG)
+pos_files = os.listdir(POS) #Lista los archivos de la carpeta de sirenas
+neg_files = os.listdir(NEG) #Lista los archivos de la carpeta de no sirenas
 
-#print("Positive files:", pos_files)
-#print("Negative files:", neg_files)
-
-# 3.2 Create Tensorflow Datasets
-pos = tf.data.Dataset.list_files(POS + '/*_*.wav')
+# Se crea un dataset de tensor flow con los archivos de sirenas y no sirenas
+pos = tf.data.Dataset.list_files(POS + '/*_*.wav') # list_files agrega al dataset todos los archivos dado unos parametros
 neg = tf.data.Dataset.list_files(NEG + '/*_*.wav')
 
-# 3.2 Add labels and combine positive and negative samples
-positives = tf.data.Dataset.zip((pos, tf.data.Dataset.from_tensor_slices(tf.ones(len(pos)))))
-negatives = tf.data.Dataset.zip((neg, tf.data.Dataset.from_tensor_slices(tf.zeros(len(neg)))))
-data = positives.concatenate(negatives)
 
-# 4. Determine Average Length of a capucin call
-# 4.1 calculate wave cycle length
+#Se agrega una etiqueta a cada archivo, 1 para sirenas y 0 para no sirenas
+positives = tf.data.Dataset.zip((pos, tf.data.Dataset.from_tensor_slices(tf.ones(len(pos))))) 
+negatives = tf.data.Dataset.zip((neg, tf.data.Dataset.from_tensor_slices(tf.zeros(len(neg)))))
+data = positives.concatenate(negatives) # Une todos los datos en un mismo dataset
+
+# Saca el promedio de la longitud de los audios
 lengths = []
 for file in os.listdir(os.path.join('data', 'unheard_wav')):
     file_path = os.path.join('data', 'unheard_wav', file)
@@ -46,15 +43,12 @@ for file in os.listdir(os.path.join('data', 'unheard_wav')):
     tensor_wave = load_wav_16k_mono(file_path)
     lengths.append(len(tensor_wave))
     
-# 4.2 calculate mean, min and max
+# Calcula el promedio, minimo y maximo de la longitud de los audios
 tf.math.reduce_mean(lengths)
-
 tf.math.reduce_min(lengths)
 tf.math.reduce_max(lengths)
 
 
-# Build Preprocessing Function
-# 5.1 Build Preprocessing Function
 def preprocess(file_path, label): 
     wav = load_wav_16k_mono(file_path)
     wav = wav[:48000]
