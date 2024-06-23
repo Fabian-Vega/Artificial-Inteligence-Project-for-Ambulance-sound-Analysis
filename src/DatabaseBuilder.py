@@ -94,16 +94,16 @@ samples.shape
 # Build Deep Learning Model
 # 7.1 Load Tensorflow Dependencies
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Dense, Flatten, Dropout, BatchNormalization
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, Dropout,BatchNormalization
 
 
 # 7.2 Build Sequential Model, Compile and View Summary
 model = Sequential()
-model.add(Conv2D(16, (3,3), activation='relu', input_shape=(1491, 257, 1)))
-model.add(Conv2D(16, (3,3), activation='relu'))
+model.add(Conv2D(16,(3,3),activation='relu', input_shape=(1491,257,1)))
+model.add(Conv2D(16,(3,3),activation='relu'))
 model.add(Flatten())
+# model.add(Dense(128, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
-
 
 from tensorflow.keras.callbacks import EarlyStopping
 
