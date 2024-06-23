@@ -58,12 +58,15 @@ tf.math.reduce_max(lengths)
 def preprocess(file_path, label): 
     wav = load_wav_16k_mono(file_path)
     wav = wav[:48000]
-    zero_padding = tf.zeros([48000] - tf.shape(wav), dtype=tf.float32)
-    wav = tf.concat([zero_padding, wav],0)
+    zero_padding = tf.zeros([48000 - tf.shape(wav)[0]], dtype=tf.float32)
+    wav = tf.concat([zero_padding, wav], 0)
     spectrogram = tf.signal.stft(wav, frame_length=320, frame_step=32)
     spectrogram = tf.abs(spectrogram)
-    spectrogram = tf.expand_dims(spectrogram, axis=2)
+    # Reshape spectrogram to a compatible 2D shape for Flatten()
+    spectrogram = tf.reshape(spectrogram, (1491, 257))  # Adjust shape as per your data
+    spectrogram = tf.expand_dims(spectrogram, axis=2)  # Add channel dimension
     return spectrogram, label
+
 
 
 # 5.2 Test out the function and viz spectrogram
@@ -102,7 +105,7 @@ model = Sequential()
 model.add(Conv2D(16,(3,3),activation='relu', input_shape=(1491,257,1)))
 model.add(Conv2D(16,(3,3),activation='relu'))
 model.add(Flatten())
-# model.add(Dense(128, activation='relu'))
+#model.add(Dense(128, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 from tensorflow.keras.callbacks import EarlyStopping
