@@ -15,7 +15,7 @@ def rename_mp3_files_in_current_folder():
     
     # Rename each mp3 file
     for index, mp3_file in enumerate(mp3_files):
-        new_name = f"testAudioNOAmbulance_{index}.mp3"
+        new_name = f"testAudioNOAmbulance_{index:02d}.mp3"
         old_file_path = os.path.join(folder_path, mp3_file)
         new_file_path = os.path.join(folder_path, new_name)
         
