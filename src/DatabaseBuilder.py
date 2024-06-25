@@ -2,19 +2,26 @@ import os
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow_io as tfio
+import librosa
 
-def load_wav_16k_mono(filename):
+def load_wav_16k_mono(filename_tensor):
     """
-    Load a WAV file, convert it to a float tensor, and resample to 16 kHz single-channel audio.
+    Load a WAV file from a TensorFlow tensor, convert it to a float tensor, and resample to 16 kHz single-channel audio.
     """
+    # Convert the tensor to a NumPy string
+    filename = filename_tensor.numpy().decode('utf-8')
+    
     # Load the WAV file using librosa
-    # librosa.load returns the audio time series as a numpy array and the sampling rate
     wav, sample_rate = librosa.load(filename, sr=16000, mono=True)  # `sr=16000` resamples to 16 kHz
 
     # Convert the numpy array to a TensorFlow tensor
     wav = tf.convert_to_tensor(wav, dtype=tf.float32)
 
     return wav
+
+# Wrap the load_wav_16k_mono function to make it compatible with TensorFlow's `tf.data.Dataset.map`
+def load_wav_16k_mono_wrapper(filename_tensor):
+    return tf.py_function(load_wav_16k_mono, [filename_tensor], tf.float32)
 
 
 POS = os.path.join('data', 'sirens_wav') #Concatena la direccion de la carpeta con los wav de las sirenas
@@ -38,8 +45,7 @@ data = positives.concatenate(negatives) # Une todos los datos en un mismo datase
 lengths = []
 for file in os.listdir(os.path.join('data', 'unheard_wav')):
     file_path = os.path.join('data', 'unheard_wav', file)
-#     print("Current file path:", file_path)
-    tensor_wave = load_wav_16k_mono(file_path)
+    tensor_wave = load_wav_16k_mono(tf.convert_to_tensor(file_path))
     lengths.append(len(tensor_wave))
     
 # Calcula el promedio, minimo y maximo de la longitud de los audios
@@ -49,13 +55,13 @@ tf.math.reduce_max(lengths)
 
 
 def preprocess(file_path, label): 
-    wav = load_wav_16k_mono(file_path)
-    wav = wav[:48000]
+    # Use the wrapper function to load the WAV file
+    wav = load_wav_16k_mono_wrapper(file_path)
+    wav = wav[:48000]  # Trim or pad the audio to 3 seconds (48,000 samples at 16 kHz)
     zero_padding = tf.zeros([48000 - tf.shape(wav)[0]], dtype=tf.float32)
     wav = tf.concat([zero_padding, wav], 0)
     spectrogram = tf.signal.stft(wav, frame_length=320, frame_step=32)
     spectrogram = tf.abs(spectrogram)
-    # Reshape spectrogram to a compatible 2D shape for Flatten()
     spectrogram = tf.reshape(spectrogram, (1491, 257))  # Adjust shape as per your data
     spectrogram = tf.expand_dims(spectrogram, axis=2)  # Add channel dimension
     return spectrogram, label
@@ -128,7 +134,6 @@ yhat = model.predict(xtest)
 yhat = [1 if prediction > 0.5 else 0 for prediction in yhat]
 
 from pydub import AudioSegment
-import librosa
 import numpy as np
 
 # Build Forest Parsing Function
