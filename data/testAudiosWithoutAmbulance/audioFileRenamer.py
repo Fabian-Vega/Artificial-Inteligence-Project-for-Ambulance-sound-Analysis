@@ -1,6 +1,9 @@
 import os
 
-def rename_mp3_files(folder_path):
+def rename_mp3_files_in_current_folder():
+    # Get the current working directory
+    folder_path = os.getcwd()
+    
     # Get list of all files in the directory
     files = os.listdir(folder_path)
     
@@ -20,5 +23,4 @@ def rename_mp3_files(folder_path):
         print(f"Renamed: {old_file_path} -> {new_file_path}")
 
 # Example usage
-folder_path = "/path/to/your/folder"  # Replace with the path to your folder
-rename_mp3_files(folder_path)
+rename_mp3_files_in_current_folder()
