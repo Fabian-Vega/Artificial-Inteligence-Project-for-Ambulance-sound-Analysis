@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
+#This function loads audio files, resamples them to 16 kHz, 
+# and converts them to mono (single-channel audio). It uses librosa for 
+# loading and resampling and TensorFlow for handling tensor conversions.
 def load_wav_16k_mono(filename_tensor):
     filename = filename_tensor.numpy().decode('utf-8')
     wav, sample_rate = librosa.load(filename, sr=16000, mono=True)
@@ -14,6 +17,9 @@ def load_wav_16k_mono(filename_tensor):
 def load_wav_16k_mono_wrapper(filename_tensor):
     return tf.py_function(load_wav_16k_mono, [filename_tensor], tf.float32)
 
+#This function converts the audio file to a Short-Time Fourier Transform (STFT) 
+# spectrogram, which is a 2D representation of the audio signal, with one dimension 
+# representing time and the other frequency. This spectrogram is the input to the CNN model.
 def preprocess(file_path, label):
     wav = load_wav_16k_mono_wrapper(file_path)
     wav = wav[:48000]
@@ -48,8 +54,16 @@ def create_datasets(pos_dir, neg_dir):
 
     return train, test
 
+#This function constructs a simple CNN using TensorFlow's Keras API. 
+# The model includes convolutional layers that are crucial for learning patterns 
+# in the spectrogram data.
 def build_model():
+    #Sequential groups a linear stack of layers into a Model.
     model = Sequential()
+    # Conv2D(Number of filters, (Size of each filter in pixels), The Rectified Linear Unit (ReLU) 
+    # activation function introduces non-linearity, allowing the network to learn complex patterns,
+    # input_shape=(The shape of the input data. For spectrograms, this means 1491 time steps, 257 frequency bins,
+    # and 1 channel.)) 
     model.add(Conv2D(16, (3, 3), activation='relu', input_shape=(1491, 257, 1)))
     model.add(Conv2D(16, (3, 3), activation='relu'))
     model.add(Flatten())
