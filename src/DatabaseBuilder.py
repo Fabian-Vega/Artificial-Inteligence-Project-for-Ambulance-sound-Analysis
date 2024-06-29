@@ -24,8 +24,8 @@ def load_wav_16k_mono_wrapper(filename_tensor):
     return tf.py_function(load_wav_16k_mono, [filename_tensor], tf.float32)
 
 
-POS = os.path.join('data', 'sirens_wav') #Concatena la direccion de la carpeta con los wav de las sirenas
-NEG = os.path.join( 'data', 'unheard_wav') #Concatena la direccion de la carpeta con los wav de las no sirenas
+POS = os.path.join('data', 'sirens') #Concatena la direccion de la carpeta con los wav de las sirenas
+NEG = os.path.join( 'data', 'unheard') #Concatena la direccion de la carpeta con los wav de las no sirenas
 
 
 pos_files = os.listdir(POS) #Lista los archivos de la carpeta de sirenas
