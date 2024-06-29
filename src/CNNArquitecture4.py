@@ -2,6 +2,9 @@ import os
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import librosa
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, Dropout, BatchNormalization, MaxPooling2D
+from tensorflow.keras.callbacks import EarlyStopping
 
 def load_wav_16k_mono(filename_tensor):
     """
@@ -94,8 +97,6 @@ samples.shape
 
 # Build Deep Learning Model
 # 7.1 Load Tensorflow Dependencies
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Dense, Flatten, Dropout, BatchNormalization, MaxPooling2D
 
 
 # 7.2 Build Sequential Model, Compile and View Summary
@@ -110,7 +111,6 @@ model.add(BatchNormalization())
 model.add(Flatten())
 model.add(Dense(1, activation='sigmoid'))
 
-from tensorflow.keras.callbacks import EarlyStopping
 
 early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 model.compile('Adam', loss='BinaryCrossentropy', metrics=[tf.keras.metrics.Recall(),tf.keras.metrics.Precision()])
