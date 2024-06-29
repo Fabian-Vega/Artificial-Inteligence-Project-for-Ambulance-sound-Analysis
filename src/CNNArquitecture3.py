@@ -121,11 +121,36 @@ model.evaluate(test)
 
 model.save('model.h5')
 
+# Plot the training history
+output_dir = 'output_graphs'
+os.makedirs(output_dir, exist_ok=True)
+
 plt.figure(figsize=(10, 6))
 plt.plot(history.history['loss'], 'r', label='Pérdida de Entrenamiento')
-plt.plot(history.history['val_loss'], 'b', label='Pérdida de Validación')
+# plt.plot(history.history['val_loss'], 'b', label='Pérdida de Validación')
 plt.title('Pérdida')
 plt.xlabel('Épocas')
 plt.ylabel('Pérdida')
 plt.legend()
-plt.show()
+plt.savefig(os.path.join(output_dir, 'loss_plot.png'))
+plt.close()
+
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['recall'], 'r', label='Recall de Entrenamiento')
+# plt.plot(history.history['val_recall'], 'b', label='Recall de Validación')
+plt.title('Recall')
+plt.xlabel('Épocas')
+plt.ylabel('Recall')
+plt.legend()
+plt.savefig(os.path.join(output_dir, 'recall_plot.png'))
+plt.close()
+
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['precision'], 'r', label='Precisión de Entrenamiento')
+# plt.plot(history.history['val_precision'], 'b', label='Precisión de Validación')
+plt.title('Precisión')
+plt.xlabel('Épocas')
+plt.ylabel('Precisión')
+plt.legend()
+plt.savefig(os.path.join(output_dir, 'precision_plot.png'))
+plt.close()
