@@ -1,7 +1,6 @@
 import os
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import tensorflow_io as tfio
 import librosa
 
 def load_wav_16k_mono(filename_tensor):
