@@ -2,9 +2,9 @@ import os
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import librosa
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Dense, Flatten, Dropout, BatchNormalization, MaxPooling2D
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.layers import Conv2D, Dense, Flatten # type: ignore
+from tensorflow.keras.callbacks import EarlyStopping # type: ignore
 
 
 
