@@ -1,25 +1,29 @@
-from pydub import AudioSegment
 import os
+from pydub import AudioSegment
 
-# Carpeta de entrada y salida
-carpeta_entrada = '../data/unheard'
-carpeta_salida = '../data/unheard_wav'
+def convert_mp3_to_wav(directory):
+    # Verificar si la ruta del directorio existe
+    if not os.path.exists(directory):
+        print(f"La carpeta {directory} no existe.")
+        return
 
-# Crear la carpeta de salida si no existe
-if not os.path.exists(carpeta_salida):
-    os.makedirs(carpeta_salida)
+    # Obtener lista de archivos .mp3 en la carpeta
+    files = [f for f in os.listdir(directory) if f.endswith('.mp3')]
 
-# Recorrer todos los archivos en la carpeta de entrada
-for archivo in os.listdir(carpeta_entrada):
-    if archivo.endswith('.mp3'):
-        # Obtener la ruta completa del archivo de entrada y salida
-        ruta_entrada = os.path.join(carpeta_entrada, archivo)
-        nombre_salida = archivo.replace('.mp3', '.wav')
-        ruta_salida = os.path.join(carpeta_salida, nombre_salida)
+    for file in files:
+        mp3_path = os.path.join(directory, file)
+        wav_path = os.path.join(directory, os.path.splitext(file)[0] + '.wav')
         
         # Convertir el archivo .mp3 a .wav
-        cancion = AudioSegment.from_mp3(ruta_entrada)
-        cancion.export(ruta_salida, format='wav')
+        audio = AudioSegment.from_mp3(mp3_path)
+        audio.export(wav_path, format='wav')
         
+        # Eliminar el archivo .mp3 original
+        os.remove(mp3_path)
+        print(f"Convertido y eliminado: {file}")
 
-print('Todos los archivos .mp3 han sido convertidos a .wav.')
+if __name__ == "__main__":
+    # Definir la ruta del directorio que contiene los archivos .mp3
+    directory = './data/sirens'
+
+    convert_mp3_to_wav(directory)
