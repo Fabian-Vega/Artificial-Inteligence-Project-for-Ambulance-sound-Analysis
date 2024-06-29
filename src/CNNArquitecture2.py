@@ -101,11 +101,23 @@ samples.shape
 
 # 7.2 Build Sequential Model, Compile and View Summary
 
-model = Sequential()
-model.add(Conv2D(32, (3,3), activation='tanh', input_shape=(1491,257,1)))
-model.add(Conv2D(64, (3,3)))
-model.add(Flatten())
-model.add(Dense(1, activation='sigmoid'))
+# Define layer names
+conv_layer_1 = Conv2D(32, (3, 3), activation='tanh', input_shape=(1491, 257, 1), name='Conv_Layer_1')
+conv_layer_2 = Conv2D(64, (3, 3), name='Conv_Layer_2')
+flatten_layer = Flatten(name='Flatten_Layer')
+output_layer = Dense(1, activation='sigmoid', name='Output_Layer')
+
+# Create a sequential model
+model = Sequential(name='Custom_Model')
+
+# Add layers to the model
+model.add(conv_layer_1)
+model.add(conv_layer_2)
+model.add(flatten_layer)
+model.add(output_layer)
+
+# Print model summary
+model.summary()
 
 
 

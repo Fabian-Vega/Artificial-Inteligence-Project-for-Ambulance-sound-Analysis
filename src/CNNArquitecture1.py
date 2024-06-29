@@ -112,14 +112,23 @@ print(f"Total number of training samples: {len(pos_files) + len(neg_files)}")
 
 
 
-# 7.2 Build Sequential Model, Compile and View Summary
+# Define layers and their names
+conv_layer_1 = Conv2D(16, (3, 3), activation='relu', input_shape=(1491, 257, 1), name='Conv_Layer_1')
+conv_layer_2 = Conv2D(16, (3, 3), activation='relu', name='Conv_Layer_2')
+flatten_layer = Flatten(name='Flatten_Layer')
+output_layer = Dense(1, activation='sigmoid', name='Output_Layer')
 
-model = Sequential()
-model.add(Conv2D(16, (3,3), activation='relu', input_shape=(1491,257,1)))
-model.add(Conv2D(16, (3,3), activation='relu'))
-model.add(Flatten())
-model.add(Dense(1, activation='sigmoid'))
+# Create a sequential model
+model = Sequential(name='Siren_Detection_Architecture_1')
 
+# Add layers to the model
+model.add(conv_layer_1)
+model.add(conv_layer_2)
+model.add(flatten_layer)
+model.add(output_layer)
+
+# Print model summary
+model.summary()
 
 
 early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
