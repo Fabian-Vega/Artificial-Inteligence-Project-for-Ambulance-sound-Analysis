@@ -2,6 +2,11 @@ import os
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import librosa
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, Dropout, BatchNormalization, MaxPooling2D
+from tensorflow.keras.callbacks import EarlyStopping
+
+
 
 def load_wav_16k_mono(filename_tensor):
     """
@@ -23,34 +28,38 @@ def load_wav_16k_mono_wrapper(filename_tensor):
     return tf.py_function(load_wav_16k_mono, [filename_tensor], tf.float32)
 
 
-POS = os.path.join('data', 'sirens') #Concatena la direccion de la carpeta con los wav de las sirenas
-NEG = os.path.join( 'data', 'unheard') #Concatena la direccion de la carpeta con los wav de las no sirenas
 
 
-pos_files = os.listdir(POS) #Lista los archivos de la carpeta de sirenas
-neg_files = os.listdir(NEG) #Lista los archivos de la carpeta de no sirenas
+POS = os.path.join('data', 'sirens') 
+NEG = os.path.join('data', 'unheard')
 
-# Se crea un dataset de tensor flow con los archivos de sirenas y no sirenas
-pos = tf.data.Dataset.list_files(POS + '/*_*.wav') # list_files agrega al dataset todos los archivos dado unos parametros
+# VAL_POS = os.path.join('data', 'sirens_validation')
+# VAL_NEG = os.path.join('data', 'unheard_validation')
+
+pos_files = os.listdir(POS) 
+neg_files = os.listdir(NEG)
+
+# val_pos_files = os.listdir(VAL_POS)
+# val_neg_files = os.listdir(VAL_NEG)
+
+# Create TensorFlow datasets for training and validation
+pos = tf.data.Dataset.list_files(POS + '/*_*.wav') 
 neg = tf.data.Dataset.list_files(NEG + '/*_*.wav')
 
+# val_pos = tf.data.Dataset.list_files(VAL_POS + '/*_*.wav')
+# val_neg = tf.data.Dataset.list_files(VAL_NEG + '/*_*.wav')
 
-#Se agrega una etiqueta a cada archivo, 1 para sirenas y 0 para no sirenas
-positives = tf.data.Dataset.zip((pos, tf.data.Dataset.from_tensor_slices(tf.ones(len(pos))))) 
-negatives = tf.data.Dataset.zip((neg, tf.data.Dataset.from_tensor_slices(tf.zeros(len(neg)))))
-data = positives.concatenate(negatives) # Une todos los datos en un mismo dataset
+# Add labels to the datasets
+positives = tf.data.Dataset.zip((pos, tf.data.Dataset.from_tensor_slices(tf.ones(len(pos_files))))) 
+negatives = tf.data.Dataset.zip((neg, tf.data.Dataset.from_tensor_slices(tf.zeros(len(neg_files)))))
 
-# Saca el promedio de la longitud de los audios
-lengths = []
-for file in os.listdir(os.path.join('data', 'unheard')):
-    file_path = os.path.join('data', 'unheard', file)
-    tensor_wave = load_wav_16k_mono(tf.convert_to_tensor(file_path))
-    lengths.append(len(tensor_wave))
-    
-# Calcula el promedio, minimo y maximo de la longitud de los audios
-tf.math.reduce_mean(lengths)
-tf.math.reduce_min(lengths)
-tf.math.reduce_max(lengths)
+# val_positives = tf.data.Dataset.zip((val_pos, tf.data.Dataset.from_tensor_slices(tf.ones(len(val_pos_files)))))
+# val_negatives = tf.data.Dataset.zip((val_neg, tf.data.Dataset.from_tensor_slices(tf.zeros(len(val_neg_files)))))
+
+# Combine positive and negative datasets for training and validation
+train_data = positives.concatenate(negatives)
+# val_data = val_positives.concatenate(val_negatives)
+
 
 
 def preprocess(file_path, label): 
@@ -72,62 +81,89 @@ filepath, label = positives.shuffle(buffer_size=10000).as_numpy_iterator().next(
 spectrogram, label = preprocess(filepath, label)
 plt.figure(figsize=(30,20))
 plt.imshow(tf.transpose(spectrogram)[0])
-#plt.show()
 
 
-# Creating Training and Testing Partisions
-# 6.1 create a tensorflow data pipeline
-data = data.map(preprocess)
-data = data.cache()
-data = data.shuffle(buffer_size = 10000)
-data = data.batch(16)
-data = data.prefetch(8)
+# Preprocess and batch the dataset
+train_data = train_data.map(preprocess)
+train_data = train_data.cache()
+train_data = train_data.shuffle(buffer_size=10000)
+train_data = train_data.batch(16)
+train_data = train_data.prefetch(8)
 
-# 6.2 Split into Training and Testing Partitions
-# print total number of samples
-print("total number of samples: "+ len(data))
+# val_data = val_data.map(preprocess)
+# val_data = val_data.cache()
+# val_data = val_data.batch(16)
+# val_data = val_data.prefetch(8)
 
-train = data.take(36)
-test = data.skip(36).take(15)
+# Print total number of samples
+print(f"Total number of training samples: {len(pos_files) + len(neg_files)}")
+# print(f"Total number of validation samples: {len(val_pos_files) + len(val_neg_files)}")
 
-# 6.3 Test One Batch
-samples, labels = train.as_numpy_iterator().next()
-samples.shape
+# train = data.take(36)
+# test = data.skip(36).take(15)
+
+# # 6.3 Test One Batch
+# samples, labels = train.as_numpy_iterator().next()
+# samples.shape
 
 
 # Build Deep Learning Model
 # 7.1 Load Tensorflow Dependencies
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Dense, Flatten, Dropout, BatchNormalization, MaxPooling2D
+
 
 
 # 7.2 Build Sequential Model, Compile and View Summary
 
 model = Sequential()
-model.add(Conv2D(16,(3,3),activation='relu', input_shape=(1491,257,1)))
-model.add(Conv2D(16,(3,3),activation='relu'))
+model.add(Conv2D(16, (3,3), activation='relu', input_shape=(1491,257,1)))
+model.add(Conv2D(16, (3,3), activation='relu'))
 model.add(Flatten())
 model.add(Dense(1, activation='sigmoid'))
 
 
-from tensorflow.keras.callbacks import EarlyStopping
 
 early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 model.compile('Adam', loss='BinaryCrossentropy', metrics=[tf.keras.metrics.Recall(),tf.keras.metrics.Precision()])
 model.summary()
 
 # Fit Model, View Loss and KPl Plots
-history = model.fit(train, epochs=5, validation_data=test)
+history = model.fit(train_data, epochs=5)
 
-model.evaluate(test)
+# model.evaluate(val_data)
 
 model.save('model.h5')
 
+
+# Plot the training history
+output_dir = 'output_graphs'
+os.makedirs(output_dir, exist_ok=True)
+
 plt.figure(figsize=(10, 6))
 plt.plot(history.history['loss'], 'r', label='Pérdida de Entrenamiento')
-plt.plot(history.history['val_loss'], 'b', label='Pérdida de Validación')
+# plt.plot(history.history['val_loss'], 'b', label='Pérdida de Validación')
 plt.title('Pérdida')
 plt.xlabel('Épocas')
 plt.ylabel('Pérdida')
 plt.legend()
-plt.show()
+plt.savefig(os.path.join(output_dir, 'loss_plot.png'))
+plt.close()
+
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['recall'], 'r', label='Recall de Entrenamiento')
+# plt.plot(history.history['val_recall'], 'b', label='Recall de Validación')
+plt.title('Recall')
+plt.xlabel('Épocas')
+plt.ylabel('Recall')
+plt.legend()
+plt.savefig(os.path.join(output_dir, 'recall_plot.png'))
+plt.close()
+
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['precision'], 'r', label='Precisión de Entrenamiento')
+# plt.plot(history.history['val_precision'], 'b', label='Precisión de Validación')
+plt.title('Precisión')
+plt.xlabel('Épocas')
+plt.ylabel('Precisión')
+plt.legend()
+plt.savefig(os.path.join(output_dir, 'precision_plot.png'))
+plt.close()
