@@ -6,6 +6,11 @@ from tensorflow.keras.models import Sequential # type: ignore
 from tensorflow.keras.layers import Conv2D, Dense, Flatten, BatchNormalization, MaxPooling2D # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping # type: ignore
 
+# AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+import time
+start_time = time.time()  # Start the timer
+# AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
 def load_wav_16k_mono(filename_tensor):
     """
     Load a WAV file from a TensorFlow tensor, convert it to a float tensor, and resample to 16 kHz single-channel audio.
@@ -102,12 +107,14 @@ samples.shape
 # 7.2 Build Sequential Model, Compile and View Summary
 
 # Define layer names
-conv_layer_1 = Conv2D(32, (3, 3), activation='relu', input_shape=(1491, 257, 1), name='Conv_Layer_1')
-max_pooling_layer_1 = MaxPooling2D(pool_size=(2, 2), name='Max_Pooling_Layer_1')
-batch_norm_layer_1 = BatchNormalization(name='BatchNorm_Layer_1')
+# conv_layer_1 = Conv2D(32, (3, 3), activation='relu', input_shape=(1491, 257, 1), name='Conv_Layer_1')
+# max_pooling_layer_2 = MaxPooling2D(pool_size=(2, 2), name='Max_Pooling_Layer_2')
+# batch_norm_layer_2 = BatchNormalization(name='BatchNorm_Layer_2')
+# batch_norm_layer_1 = BatchNormalization(name='BatchNorm_Layer_1')
+
+max_pooling_layer_1 = MaxPooling2D(pool_size=(2, 2),input_shape=(1491, 257, 1), name='Max_Pooling_Layer_1')
+conv_layer_1 = Conv2D(32, (3, 3), activation='relu', name='Conv_Layer_1')
 conv_layer_2 = Conv2D(64, (3, 3), activation='relu', name='Conv_Layer_2')
-max_pooling_layer_2 = MaxPooling2D(pool_size=(2, 2), name='Max_Pooling_Layer_2')
-batch_norm_layer_2 = BatchNormalization(name='BatchNorm_Layer_2')
 flatten_layer = Flatten(name='Flatten_Layer')
 output_layer = Dense(1, activation='sigmoid', name='Output_Layer')
 
@@ -115,14 +122,18 @@ output_layer = Dense(1, activation='sigmoid', name='Output_Layer')
 model = Sequential(name='Siren_Detection_Architecture_4')
 
 # Add layers to the model
-model.add(conv_layer_1)
 model.add(max_pooling_layer_1)
-model.add(batch_norm_layer_1)
+model.add(conv_layer_1)
 model.add(conv_layer_2)
-model.add(max_pooling_layer_2)
-model.add(batch_norm_layer_2)
 model.add(flatten_layer)
 model.add(output_layer)
+
+
+
+# model.add(max_pooling_layer_1)
+# model.add(batch_norm_layer_1)
+# model.add(max_pooling_layer_2)
+# model.add(batch_norm_layer_2)
 
 
 early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
@@ -134,7 +145,18 @@ history = model.fit(train, epochs=5, validation_data=test)
 
 model.evaluate(test)
 
+end_time = time.time()  # End the timer
+
+# Calculate the execution time
+# AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+end_time = time.time()  # End the timer
+execution_time = end_time - start_time
+print(f"Program executed in: {execution_time} seconds")
+# AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
 model.save('model.h5')
+
+
 
 # Plot the training history
 output_dir = 'output_graphs'
