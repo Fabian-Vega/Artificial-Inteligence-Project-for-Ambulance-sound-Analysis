@@ -108,7 +108,7 @@ flatten_layer = Flatten(name='Flatten_Layer')
 output_layer = Dense(1, activation='sigmoid', name='Output_Layer')
 
 # Create a sequential model
-model = Sequential(name='Custom_Model')
+model = Sequential(name='Siren_Detection_Architecture_2')
 
 # Add layers to the model
 model.add(conv_layer_1)
