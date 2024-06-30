@@ -1,44 +1,36 @@
 import pandas as pd
-import numpy as np
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 
-# Leer el archivo CSV
-data = pd.read_csv('./results/results15.csv')
+# Cargar datos desde el archivo CSV
+df = pd.read_csv('results2.csv')
 
-# Crear las etiquetas verdaderas (y_true)
-data['true_label'] = data['recording'].apply(lambda x: 0 if 'NOAmbulance' in x else 1)
+# Definir etiquetas verdaderas y predicciones
+y_true = df['ambulances']  # Etiquetas verdaderas
+y_pred = [1 if filename.startswith('sirens') else 0 for filename in df['recording']]  # Predicciones
 
-# Procesar los valores de ambulances
-data['predicted_label'] = data['ambulances'].apply(lambda x: 1 if x > 1 else x)
+# Calcular la matriz de confusión
+conf_matrix = confusion_matrix(y_true, y_pred)
 
-# Extraer las etiquetas verdaderas y las predicciones
-y_true = data['true_label']
-y_pred = data['predicted_label']
+# Mostrar la matriz de confusión como gráfico
+plt.figure(figsize=(8, 6))
+plt.imshow(conf_matrix, interpolation='nearest', cmap=plt.cm.Blues)
+plt.title('Matriz de Confusión')
+plt.colorbar()
 
-# Crear la matriz de confusión
-cm = confusion_matrix(y_true, y_pred)
+classes = ['Positvo (1)', 'Negativo (0)']
+tick_marks = [0, 1]
 
-# Reorganizar la matriz de confusión para que TP esté arriba a la izquierda
-reordered_cm = np.array([
-    [cm[1, 1], cm[1, 0]],
-    [cm[0, 1], cm[0, 0]]
-])
+plt.xticks(tick_marks, classes)
+plt.yticks(tick_marks, classes)
 
-# Crear un gráfico de matriz de confusión con etiquetas numéricas
-disp = ConfusionMatrixDisplay(confusion_matrix=reordered_cm, display_labels=['positivo', 'negativo'])
-disp.plot(cmap=plt.cm.Blues, colorbar=False)
-plt.title('Matriz de Confusión con 15 épocas')
-plt.ylabel('Actual')
+thresh = conf_matrix.max() / 2.
+for i, j in [(0, 0), (0, 1), (1, 0), (1, 1)]:
+    plt.text(j, i, format(conf_matrix[i, j], 'd'),
+             horizontalalignment="center",
+             color="white" if conf_matrix[i, j] > thresh else "black")
+
+plt.ylabel('Etiqueta Verdadera')
 plt.xlabel('Predicción')
+plt.tight_layout()
 plt.show()
-
-# Imprimir los valores de la matriz de confusión reorganizada
-print('Matriz de Confusión Reorganizada:\n', reordered_cm)
-
-# Extraer valores TN, FP, FN, TP de la matriz reorganizada
-tn, fp, fn, tp = reordered_cm.ravel()
-print(f'True Negatives (TN): {tn}')
-print(f'False Positives (FP): {fp}')
-print(f'False Negatives (FN): {fn}')
-print(f'True Positives (TP): {tp}')
