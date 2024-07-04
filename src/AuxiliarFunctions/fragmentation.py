@@ -40,8 +40,8 @@ def cortar_mp3(ruta_mp3, duracion_segmento, ruta_salida, prefijo_salida):
     return segmentos
 
 # Ejemplo de uso
-ruta_mp3 = '../data/sonidoAmbiente.mp3'
-ruta_salida = '../data/unheard'
-duracion_segmento = 3  # Duración del segmento en segundos
-prefijo_salida = 'segment'
+ruta_mp3 = 'data/NewAudios/Wind/Wind.mp3'
+ruta_salida = './data/unheard'
+duracion_segmento = 3  
+prefijo_salida = 'wind' #NOTA: en snake_case, no agregar guion bajo al final
 segmentos = cortar_mp3(ruta_mp3, duracion_segmento, ruta_salida, prefijo_salida)

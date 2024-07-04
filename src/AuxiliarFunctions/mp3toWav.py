@@ -24,6 +24,6 @@ def convert_mp3_to_wav(directory):
 
 if __name__ == "__main__":
     # Definir la ruta del directorio que contiene los archivos .mp3
-    directory = './data/sirens'
+    directory = './data/unheard'
 
     convert_mp3_to_wav(directory)
