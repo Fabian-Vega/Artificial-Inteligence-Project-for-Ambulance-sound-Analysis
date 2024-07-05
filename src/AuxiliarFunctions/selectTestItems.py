@@ -31,8 +31,8 @@ def move_random_files(input_path, output_path, x):
 
 if __name__ == "__main__":
     # Definir las rutas de entrada y salida y la cantidad de archivos a mover
-    input_path = './data/sirens'
-    output_path = './data/sirens_test'
+    input_path = './data/unheard'
+    output_path = './data/unheard_test'
     x = 50
 
     move_random_files(input_path, output_path, x)
