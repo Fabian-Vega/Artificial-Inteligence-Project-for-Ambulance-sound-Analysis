@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
 # Cargar datos desde el archivo CSV (reemplaza 'results4.csv' con tu archivo)
-df = pd.read_csv('results4.csv')
+df = pd.read_csv('results3.csv')
 
 # Definir etiquetas verdaderas y predicciones
 y_true = df['ambulances']  # Etiquetas verdaderas
