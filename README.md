@@ -2,7 +2,7 @@
 
 Este proyecto propone un sistema basado en **redes neuronales convolucionales (CNN)** para detectar sonidos de sirenas de ambulancia en entornos urbanos de San José, Costa Rica. El sistema está diseñado especialmente para asistir a personas con discapacidad auditiva, permitiéndoles identificar la presencia de vehículos de emergencia a través de señales visuales generadas por un sistema inteligente.
 
-📄 [Ver el artículo completo en PDF](Detección de Sirenas para conductores con discapacidad auditiva con CNN.pdf)
+📄 [Ver el artículo completo en PDF](Deteccion%20de%20Sirenas%20para%20conductores%20con%20discapacidad%20auditiva%20con%20CNN.pdf)
 
 ---
 
